@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/** Admin-only endpoints for managing products and orders. Guarded by hasRole("ADMIN") in SecurityConfig. */
 @RestController
 @RequestMapping("/api/admin")
 @RequiredArgsConstructor

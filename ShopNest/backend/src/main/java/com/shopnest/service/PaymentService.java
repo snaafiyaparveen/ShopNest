@@ -23,13 +23,6 @@ public class PaymentService {
 
     private final OrderService orderService;
 
-    /*
-     * DEMO:
-     * No Razorpay API is called.
-     *
-     * RAZORPAY:
-     * Real Razorpay payment processing is used.
-     */
     @Value("${payment.mode:DEMO}")
     private String paymentMode;
 
@@ -39,21 +32,9 @@ public class PaymentService {
     @Value("${razorpay.key-secret:}")
     private String keySecret;
 
-
-    /**
-     * Creates a payment order.
-     *
-     * In DEMO mode, no Razorpay API call is made.
-     *
-     * In RAZORPAY mode, an actual Razorpay order is created.
-     */
     public Map<String, Object> createRazorpayOrder(Order order) {
 
-        /*
-         * ==========================================
-         * DEMO MODE
-         * ==========================================
-         */
+
         if ("DEMO".equalsIgnoreCase(paymentMode)) {
 
             String demoOrderId =
@@ -82,11 +63,6 @@ public class PaymentService {
         }
 
 
-        /*
-         * ==========================================
-         * REAL RAZORPAY MODE
-         * ==========================================
-         */
         if (!"RAZORPAY".equalsIgnoreCase(paymentMode)) {
 
             throw new BadRequestException(
@@ -94,10 +70,6 @@ public class PaymentService {
             );
         }
 
-
-        /*
-         * Check Razorpay credentials.
-         */
         if (keyId == null || keyId.isBlank()
                 || keySecret == null || keySecret.isBlank()) {
 
@@ -114,11 +86,6 @@ public class PaymentService {
 
             JSONObject options = new JSONObject();
 
-            /*
-             * Razorpay expects amount in paise.
-             *
-             * ₹2499 = 249900 paise
-             */
             options.put(
                     "amount",
                     order.getTotalAmount()
@@ -184,12 +151,6 @@ public class PaymentService {
         }
     }
 
-
-    /**
-     * Completes a DEMO payment.
-     *
-     * No Razorpay API is contacted.
-     */
     public void completeDemoPayment(Order order) {
 
         if (!"DEMO".equalsIgnoreCase(paymentMode)) {
@@ -199,10 +160,6 @@ public class PaymentService {
             );
         }
 
-        /*
-         * Generate a fake payment ID so the order
-         * still has a payment reference.
-         */
         order.setRazorpayPaymentId(
                 "demo_payment_" + UUID.randomUUID()
         );
@@ -212,10 +169,6 @@ public class PaymentService {
         orderService.save(order);
     }
 
-
-    /**
-     * Verifies a real Razorpay payment signature.
-     */
     public boolean verifySignature(
             PaymentVerificationRequest request) {
 
@@ -261,10 +214,6 @@ public class PaymentService {
         }
     }
 
-
-    /**
-     * Marks a real Razorpay payment as PAID.
-     */
     public void markOrderPaid(
             Order order,
             String razorpayPaymentId) {
@@ -278,10 +227,6 @@ public class PaymentService {
         orderService.save(order);
     }
 
-
-    /**
-     * Marks an order as FAILED.
-     */
     public void markOrderFailed(Order order) {
 
         order.setStatus(OrderStatus.FAILED);

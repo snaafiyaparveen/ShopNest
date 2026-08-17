@@ -27,10 +27,6 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
 
-    /**
-     * Gets the user's cart.
-     * Creates one if the user does not have a cart yet.
-     */
     public Cart getOrCreateCart(User user) {
         return cartRepository.findByUser(user)
                 .orElseGet(() ->
@@ -42,17 +38,11 @@ public class CartService {
                 );
     }
 
-    /**
-     * Returns the current user's cart.
-     */
     @Transactional(readOnly = true)
     public CartResponse getCart(User user) {
         return toResponse(getOrCreateCart(user));
     }
 
-    /**
-     * Adds a product to the user's cart.
-     */
     public CartResponse addItem(
             User user,
             CartItemRequest request
@@ -121,11 +111,6 @@ public class CartService {
         return toResponse(cart);
     }
 
-    /**
-     * Updates the quantity of a cart item.
-     *
-     * Quantity <= 0 removes the item.
-     */
     public CartResponse updateItemQuantity(
             User user,
             Long cartItemId,
@@ -144,11 +129,6 @@ public class CartService {
         if (quantity <= 0) {
             cartItemRepository.delete(item);
 
-            /*
-             * Remove it from the in-memory collection as well.
-             * This makes the response immediately reflect
-             * the deletion.
-             */
             cart.getItems().remove(item);
 
             return toResponse(cart);
@@ -175,9 +155,6 @@ public class CartService {
         return toResponse(cart);
     }
 
-    /**
-     * Removes a single item from the cart.
-     */
     public CartResponse removeItem(
             User user,
             Long cartItemId
@@ -189,33 +166,15 @@ public class CartService {
                 cartItemId
         );
 
-        /*
-         * Delete from database.
-         */
         cartItemRepository.delete(item);
 
-        /*
-         * Also remove from the Cart entity's collection.
-         *
-         * Without this, cart.getItems() may still contain
-         * the deleted item during the same transaction.
-         */
         cart.getItems().remove(item);
 
-        /*
-         * Flush the deletion so the database is updated
-         * before returning the response.
-         */
         cartItemRepository.flush();
 
         return toResponse(cart);
     }
 
-    /**
-     * Clears all items from a cart.
-     *
-     * Used after an order is successfully placed.
-     */
     public void clearCart(Cart cart) {
         if (cart == null || cart.getItems() == null) {
             return;
@@ -229,10 +188,6 @@ public class CartService {
         }
     }
 
-    /**
-     * Finds a cart item and verifies that it belongs
-     * to the supplied user's cart.
-     */
     private CartItem findCartItem(
             Cart cart,
             Long cartItemId
@@ -250,9 +205,6 @@ public class CartService {
                 );
     }
 
-    /**
-     * Converts Cart entity to CartResponse.
-     */
     private CartResponse toResponse(Cart cart) {
 
         List<CartResponse.CartItemResponse> items =

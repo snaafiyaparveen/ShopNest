@@ -12,10 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
-/**
- * Seeds an initial admin user and a handful of demo products on first boot,
- * so the app is immediately browsable without manual setup.
- */
 @Component
 @RequiredArgsConstructor
 public class DataSeeder implements CommandLineRunner {

@@ -31,7 +31,6 @@ public class ProductService {
         return productRepository.search(query).stream().map(this::toResponse).toList();
     }
 
-    /** Used to power the "Picked for you" personalized feed: top rated active products. */
     public List<ProductResponse> getRecommended() {
         return productRepository.findTop10ByActiveTrueOrderByRatingDesc()
                 .stream().map(this::toResponse).toList();

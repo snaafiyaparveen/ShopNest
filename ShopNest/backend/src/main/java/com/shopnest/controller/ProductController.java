@@ -22,7 +22,6 @@ public class ProductController {
         return productService.getAll();
     }
 
-    /** Powers the "Picked for you" personalized feed on the home page. */
     @GetMapping("/recommended")
     public List<ProductResponse> getRecommended() {
         return productService.getRecommended();
